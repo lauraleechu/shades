@@ -20,3 +20,5 @@ outputs/paper/.DS_Store
 *.css
 *.js
 *.woff
+.Rdata
+.httr-oauth
