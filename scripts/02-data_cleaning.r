@@ -30,13 +30,35 @@ write_csv(
 
 ```{r}
 
+#Adding column to organize by shade range 
 lightnessrange <- cleanshades |>
   mutate(light_range = cut(L, c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, Inf)))|>
-  group_by(L)
-
+  group_by(L) 
+  
 write_csv(
   x = lightnessrange,
   file = here::here("inputs/data/clean/lightnessrange.csv"),
 )
+```
+
+```{r}
+brand_origin <- lightnessrange |>  
+  mutate(
+    origin = if_else(
+      condition = brand %in% c("NARS", "Dior", "Maybelline", "L'Oréal"), 
+      true = "International", 
+      false = "Domestic"
+      ))
+
+write_csv(
+  x = brand_origin,
+  file = here::here("inputs/data/clean/brand_origin.csv"),
+)
+```
+
+```{r}
+
+
+
 ```
 
