@@ -9,7 +9,7 @@ editor: visual
 toc: TRUE
 number-sections: TRUE
 bibliography: references.bib
-thanks: "Code and data supporting this analysis is available at: "
+thanks: "Code and data supporting this analysis is available at: https://github.com/lauraleechu/shades"
 ---
 
 ```{r}
@@ -18,11 +18,6 @@ thanks: "Code and data supporting this analysis is available at: "
 #| warning: false
 #| output: false
 
-#### Preamble ####
-# Title:
-# Author: Laura Lee-Chu
-# Email: 
-# Date: 16 March 2023
 
 #### Work space set-up ####
 # Define required libraries 
