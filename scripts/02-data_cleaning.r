@@ -1,8 +1,8 @@
 ```{r}
-# Preamble 
-# Purpose: Import raw csv data, clean it, and generate new csv files
+#### Preamble ####
+# Purpose: Import raw data and clean it 
 # Author: Laura Lee-Chu
-# Date: 16 March 2023
+# Date: 20 April 2023
 
 
 #Workspace set-up 
@@ -42,6 +42,8 @@ write_csv(
 ```
 
 ```{r}
+
+#classifying brands by international or domestic 
 brand_origin <- lightnessrange |>  
   mutate(
     origin = if_else(
@@ -57,10 +59,4 @@ write_csv(
 ```
 
 
-
-```{r}
-
-
-
-```
 

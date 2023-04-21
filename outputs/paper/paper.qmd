@@ -29,17 +29,16 @@ thanks: "Code and data supporting this analysis is available at: "
 
 library(tidyverse)
 library(dplyr)
+library(tidyr)
 library(knitr)
 library(janitor)
 library(scales)
-library(RColorBrewer)
 library(ggplot2)
 library(kableExtra)
 library(here)
 library(readr)
-library(ggalt)
-library(broom)
 library(kableExtra)
+library(broom)
 
 # Fetching the shade range data 
 cleanshades <- readr::read_csv(here::here("inputs/data/clean/cleanshades.csv"), show_col_types = FALSE)
@@ -49,42 +48,46 @@ lightnessrange <- readr::read_csv(here::here("inputs/data/clean/lightnessrange.c
 brand_origin <- readr::read_csv(here::here("inputs/data/clean/brand_origin.csv"), show_col_types = FALSE)
 ```
 
+\newpage
+
 # Introduction 
 
-The issue of colorism has been a persistent and pervasive concern across the world. In societies where attractiveness is highly valued, women often rely on makeup to enhance their appearance, with companies capitalizing on these insecurities to promote their products. With the growing popularity of makeup brands, the beauty industry has perpetuated and exacerbated colorism, particularly in Japan and India, which are among the largest beauty markets in Asia (CITATION). 
+The issue of colorism has been a persistent and pervasive concern across the world. In societies where attractiveness is highly valued, women often rely on makeup to enhance their appearance, with companies capitalizing on these insecurities to promote their products. With the growing popularity of makeup brands, the beauty industry has perpetuated and exacerbated colorism, particularly in Japan and India, which are among the largest beauty markets in Asia. 
 
-The roots of colorism in Japan and India have historical and cultural origins that have contributed to the perpetuation of this issue in modern society. In Japan, the association of fair skin with beauty and status can be traced back to its aristocracy, who were able to avoid outdoor labour and maintain a pale complexion (CITATION). This idea became ingrained in Japanese society and is reinforced through media, advertising, and popular culture. The influence of Western beauty standards, introduced through the influx of mass media from the United States after World War II, has also contributed to the shift towards lighter skin tones in Japan (CITATION).
+The roots of colorism in Japan and India have historical and cultural origins that have contributed to the perpetuation of this issue in modern society. In Japan, the association of fair skin with beauty and status can be traced back to its aristocracy, who were able to avoid outdoor labour and maintain a pale complexion [@japan]. This idea became ingrained in Japanese society and is reinforced through media, advertising, and popular culture. The influence of Western beauty standards, introduced through the influx of mass media from the United States after World War II, has also contributed to the shift towards lighter skin tones in Japan [@japan].
 
-Similarly, in India, the issue of colorism has been exacerbated by the history of colonialism, with the British favouring Indians with lighter skin for government jobs. This discrimination based on skin colour has persisted in Indian society, with fair skin being equated with higher social status and dark skin being associated with lower status (CITATION). The impacts of colorism in India are widespread, affecting social mobility, education, employment, and marriage.
+Similarly, in India, the issue of colorism has been exacerbated by the history of colonialism, with the British favouring Indians with lighter skin for government jobs. This discrimination based on skin colour has persisted in Indian society, with fair skin being equated with higher social status and dark skin being associated with lower status [@india]. The impacts of colorism in India are widespread, affecting social mobility, education, employment, and marriage.
 
-In addition to the negative impact on individuals, colorism also has wider societal consequences. Individuals with darker skin tones face exclusion and marginalization, as well as limited access to products and services, leading to unequal opportunities in various aspects of life (CITATION). The globalization of beauty standards has further compounded the issue, with Western ideals of beauty being prioritized and perpetuated by the beauty industry.
+In addition to the negative impact on individuals, colorism also has wider societal consequences. Individuals with darker skin tones face exclusion and marginalization, as well as limited access to products and services, leading to unequal opportunities in various aspects of life [@japan]. The globalization of beauty standards has further compounded the issue, with Western ideals of beauty being prioritized and perpetuated by the beauty industry.
 
-To better understand the issue of colorism in Japan and India, the present study draws on data from an article published by The Pudding, a digital publisher specializing in data journalism. The original article examined the lack of diversity in makeup shades offered by major cosmetic brands (CITATION). However, the current study will focus specifically on the context of Asia and the role of colorism in perpetuating limited shade ranges, with a particular focus on Japan and India.
+To better understand the issue of colorism in Japan and India, the present study draws on data from an article published by The Pudding, a digital publisher specializing in data journalism. The original article examined the lack of diversity in makeup shades offered by major cosmetic brands [@pudding]. However, the current study will focus specifically on the context of Asia and the role of colorism in perpetuating limited shade ranges, with a particular focus on Japan and India.
 
 This paper examines the association between the lightness and saturation of foundation shades provided by leading makeup brands in India and Japan. The findings revealed that international brands exhibit a preference for lighter shades, whereas domestic brands offer a broader spectrum of shades with warmer undertones. A linear regression model was employed, and a noteworthy negative correlation was discovered between the saturation and lightness of foundation shades. Specifically, as saturation rises, the expected lightness of the foundation shade diminishes. The study further unveiled that, on average, Japanese foundation shades are paler and have an ashier tone, whereas Indian foundation shades are substantially lighter than the natural skin tone. This scarcity of foundation shades for individuals with darker skin tones can lead to their marginalization and exclusion.
 
+\newpage
 
 # Data 
 
-The primary tool used to analyse data in this paper is R, an open-source statistical programming language [@cite_tool_r]. The paper also uses a number of R packages, including: dplyr [@cite_tool_dplyr], foreign [@cite_tool_foreign], ggplot2 [@cite_tool_ggplot2], here [@cite_tool_here], janitor [@cite_tool_janitor], kableExtra [@cite_tool_kableextra], knitr [@cite_tool_knitr], lubridate [@cite_tool_lubridate], readr [@cite_tool_readr], RColorBrewer [@cite_tool_rcolorbrewer], scales [@cite_tool_scales], and tidyverse [@cite_tool_tidyverse].
+This paper was produced using the R statistical programming language [@citeR]. here was used to reference file locations [@here]. The data was examined and cleaned using the packages janitor [@janitor], dplyr [@dplyr], and tidyverse [@tidyverse]. Tables were made knitr [@knitr] and broom [@broom], and formatted with kableExtra [@kableExtra]. ggplot2 [@ggplot2] was used to plot and scale the graphs.
 
 ## The Dataset
 
-The dataset was specifically curated for application in The Pudding essay entitled "Beauty Brawl," which was published in June of 2018 (CITATION). The data was obtained through a systematic process that involved identifying prominent beauty brands in the United States, Nigeria, India, and Japan, as well as consulting various sources that verified their status as best-selling products within their respective domestic markets. The research team accessed each of the brand's official websites in May of 2018 and isolated their liquid foundation collection that possessed the most extensive variety of available shades. For each colour swatch displayed for the product, the corresponding hex colour values were recorded. Subsequently, Adobe Photoshop was utilized to extract the lightness value of each colour using the CIE Lab colour model.
+The dataset was specifically curated for application in The Pudding essay entitled "Beauty Brawl," which was published in June of 2018 [@pudding]. The data was obtained through a systematic process that involved identifying prominent beauty brands in the United States, Nigeria, India, and Japan, as well as consulting various sources that verified their status as best-selling products within their respective domestic markets. The research team accessed each of the brand's official websites in May of 2018 and isolated their liquid foundation collection that possessed the most extensive variety of available shades. For each colour swatch displayed for the product, the corresponding hex colour values were recorded. Subsequently, Adobe Photoshop was utilized to extract the lightness value of each colour using the CIE Lab colour model.
 
 To further classify the sampled products, two additional columns were incorporated into the dataset. These columns included "Brand," which provided the complete written title of the brand responsible for producing the specific foundation shade, and "Product," which listed the full name of the sampled foundation product. It should be noted that for certain brands, this foundation line represented their sole range of liquid foundation, while for others, it constituted the product line containing the largest quantity of available shades. 
 
 Moreover, it is worth noting that each product within the dataset is exclusively assigned to a single group. In the dataset, a total of seven distinct groups were employed for classification:
- • 0: Fenty Beauty's PRO FILT'R Foundation Only
- • 1: Make Up For Ever's Ultra HD Foundation Only
- • 2: US Best Sellers
- • 3: BIPOC-recommended Brands with BIPOC Founders
- • 4: BIPOC-recommended Brands with White Founders
- • 5: Nigerian Best Sellers
- • 6: Japanese Best Sellers
- • 7: Indian Best Sellers
 
-The dataset included information on the hexadecimal colour code (hex), hue (angle on the colour wheel), saturation (degree of colour/chroma), and brightness (also known as value, which measures the lightness or darkness halfway point) values of the foundation shades. The lightness (the relative degree of black or white) values were derived using the CIE Lab colour model, which is predicated on the human perception of colour. The numerical values in the CIE Lab model describe the full spectrum of colours that are visible to individuals with normal vision. As the CIE Lab model represents how a colour appears rather than specifying the quantity of a particular colourant required for a particular device (such as a digital camera, monitor, or desktop printer) to generate colours, it is regarded as a device-independent colour model. To ensure reliable and consistent colour transformation from one colour space to another, colour management systems use the CIE Lab model as a reference point (CITATION).
+ * 0: Fenty Beauty's PRO FILT'R Foundation Only
+ * 1: Make Up For Ever's Ultra HD Foundation Only
+ * 2: US Best Sellers
+ * 3: BIPOC-recommended Brands with BIPOC Founders
+ * 4: BIPOC-recommended Brands with White Founders
+ * 5: Nigerian Best Sellers
+ * 6: Japanese Best Sellers
+ * 7: Indian Best Sellers
+
+The dataset included information on the hexadecimal colour code (hex), hue (angle on the colour wheel), saturation (degree of colour/chroma), and brightness (also known as value, which measures the lightness or darkness halfway point) values of the foundation shades. The lightness (the relative degree of black or white) values were derived using the CIE Lab colour model, which is predicated on the human perception of colour. The numerical values in the CIE Lab model describe the full spectrum of colours that are visible to individuals with normal vision. As the CIE Lab model represents how a colour appears rather than specifying the quantity of a particular colourant required for a particular device (such as a digital camera, monitor, or desktop printer) to generate colours, it is regarded as a device-independent colour model. To ensure reliable and consistent colour transformation from one colour space to another, colour management systems use the CIE Lab model as a reference point [@adobe].
 
 One of the limitations of the dataset used in this study is that it only covers data from 2018. Since then, various social movements have taken place around the world that may have influenced the range of foundation shades offered by makeup brands. Furthermore, the hex codes used in the dataset do not provide any meaningful information unless visually modelled. However, due to the large number of values and their lack of proper notation, the process of visual modelling is extremely time-consuming. Unfortunately, no other datasets with similar or related content were available for use in this study.
 
@@ -102,7 +105,8 @@ To narrow the scope of the study to Asia, the focus was shifted to only include 
 #| warning: false
 
 
-#TABLE 2 - Total number of products by lightness range 
+#Create table to summarize lightness range 
+
  summary <- brand_origin |>
   tabyl(group, light_range) |>
   adorn_totals("col") 
@@ -110,7 +114,7 @@ To narrow the scope of the study to Asia, the focus was shifted to only include 
 colnames(summary) <- c("Country", "20 - 30", "50-60", "60-70", "70-80", "80-90", "Total")
 
 summary |>
-  kable() |>
+  kable(caption = "Table 1: Total number of products by lightness range in India & Japan") |>
   kable_styling(full_width = F) |>
   add_header_above(c(" " = 1, "Lightness Range" = 6))
 
@@ -125,8 +129,7 @@ The dataset comprises 9 distinct brands for India and 8 for Japan. Table 2 indic
 #| echo: false
 #| warning: false
 
-# figure 1 - Distribution by Lightness
-#Japan & India by domestic/international 
+#plot graph to show shade distribution by lightness
 
 brand_origin |>
   ggplot(aes(x = group, y = L, fill = origin)) +
@@ -135,13 +138,19 @@ brand_origin |>
   theme_minimal() +
   labs(x = "Country",
     y = "Lightness",
+    title = "Fig. 1: Shade Distribution by Lightness: Domestic vs. International Brands",
     color = "Country",
-    title = "Distribution of Foundation Lightness between Domestic and International Brands",
-    caption = "Data source: The Pudding.") 
-   
+    caption = "Data source: The Pudding.")
+```
 
 
-#figure 2 - Distribution by Saturation
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+
+#plot graph to show shade distribution by saturation
+
 brand_origin |>
   ggplot(aes(x = group, y = S, fill = origin)) +
   geom_boxplot() +
@@ -150,7 +159,7 @@ brand_origin |>
   labs(x = "Country",
     y = "Saturation",
     color = "Country",
-    title = "Distribution of Foundation Saturation between Domestic and International Brands",
+    title = "Fig. 2: Shade Distribution by Saturation: Domestic vs. International Brands",
     caption = "Data source: The Pudding") 
  
 
@@ -162,7 +171,7 @@ As depicted in Figure 1, the analysis of the Indian market reveals that internat
 Nevertheless, a contrasting trend emerges when considering the undertones of foundation products. Figure 2 illustrates the saturation distribution between international and domestic brands, revealing that in both the Indian and Japanese markets, international brands exhibit a wider range of saturation compared to their domestic counterparts. In India, domestic brands demonstrate a significantly higher median saturation, implying a warmer tone, with a multitude of outliers situated at the upper end of the saturation scale. Conversely, international brands feature a significantly lower median saturation, indicating a cooler or ashy tone. In Japan, both domestic and international brands have a similar median saturation, with domestic brands marginally higher. However, international brands have a significantly higher maximum saturation, indicating warm undertones and domestic brands feature a lower minimum saturation.
 
 
-
+\newpage
 
 # Model
 Given the similarity in lightness observed in foundation shades across both countries, it was of interest to investigate if any differences in saturation existed. This investigation was motivated by the fact that the local population in each country has unique undertones. Before conducting the analysis, several tests were conducted to verify that the model assumptions (See Appendix A), including linearity, normality, and homoscedasticity of residuals, were satisfied, thereby ensuring that the model was well-suited for the data at hand.
@@ -174,21 +183,23 @@ The alternative hypothesis: there is a significant linear relationship between t
 
 A linear regression analysis can be conducted to test this hypothesis and to determine whether a statistically significant relationship exists between the variables. A low p-value for the regression coefficient for saturation would provide evidence against the null hypothesis, indicating that changes in saturation do result in a meaningful variation in lightness across foundation shades. On the other hand, if the p-value is high, this would suggest that there is not enough evidence to reject the null hypothesis, and there may be no significant linear relationship between the variables. Ultimately, the results of the analysis will inform whether the null hypothesis can be rejected or not. The mathematical equation for the linear regression model can be written as:
 
-L = β0 + β1*S + ε
+$$L = \beta_0 + \beta_1S + \epsilon$$
 
 Where:
-•	L represents the dependent variable, which is the overall lightness of the foundation shade
-•	S represents the independent variable, which is the saturation of the foundation shade
-•	β0 represents the intercept of the regression line, which is the predicted value of L when S is equal to zero
-•	β1 represents the slope of the regression line, which is the change in L for a one-unit increase in S
-•	ε represents the random error term, which accounts for variability in L that is not explained by the relationship with S
 
-The aim of linear regression is to estimate the values of β0 and β1 that minimize the sum of squared errors between the predicted and actual values of lightness (L) for the given values of saturation (S) in the dataset. By minimizing this sum of squared errors, the linear regression model can produce the best-fit line to describe the linear relationship between the two variables, allowing for the estimation of L values based on known S values.
+- $L$ represents the dependent variable, which is the overall lightness of the foundation shade
+- $S$ represents the independent variable, which is the saturation of the foundation shade
+- $\beta_0$ represents the intercept of the regression line, which is the predicted value of $L$ when $S$ is equal to zero
+- $\beta_1$ represents the slope of the regression line, which is the change in $L$ for a one-unit increase in $S$
+- $\epsilon$ represents the random error term, which accounts for variability in $L$ that is not explained by the relationship with $S$
 
-In this project, the lightness variable (L) is measured on a scale of 0 to 100, while the saturation variable (S) is measured on a scale of 0 to 1. Therefore, the slope coefficient β1 in the linear regression model would represent the change in lightness (L) for a one-unit increase in saturation (S), where a one-unit increase in S corresponds to an increase of 1/100 in the saturation of the foundation shade. The intercept β0 in the model would represent the expected value of L when S is equal to zero, which in this case would correspond to the lightness value for a completely desaturated foundation shade.
+The aim of linear regression is to estimate the values of $\beta_0$ and $\beta_1$ that minimize the sum of squared errors between the predicted and actual values of lightness ($L$) for the given values of saturation ($S$) in the dataset. By minimizing this sum of squared errors, the linear regression model can produce the best-fit line to describe the linear relationship between the two variables, allowing for the estimation of $L$ values based on known $S$ values.
+
+In this project, the lightness variable ($L$) is measured on a scale of 0 to 100, while the saturation variable ($S$) is measured on a scale of 0 to 1. Therefore, the slope coefficient $\beta_1$ in the linear regression model would represent the change in lightness ($L$) for a one-unit increase in saturation ($S$), where a one-unit increase in $S$ corresponds to an increase of 1/100 in the saturation of the foundation shade. The intercept $\beta_0$ in the model would represent the expected value of $L$ when $S$ is equal to zero, which in this case would correspond to the lightness value for a completely desaturated foundation shade.
 
 
 
+\newpage
 
 # Results
 
@@ -197,13 +208,13 @@ In this project, the lightness variable (L) is measured on a scale of 0 to 100, 
 #| echo: false
 #| warning: false
 
-#Table 3 - Regression Results
+# create table to summarize regression findings 
 
 model <- lm(L ~ S, data = brand_origin)
 
 summary <- tidy(model)
 
-kbl(summary, caption = "Linear Regression Model Summary") %>%
+kbl(summary, caption = "Table 2: Linear Regression Model Summary") |>
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
 
 
@@ -217,7 +228,9 @@ These findings suggest that as the saturation of a foundation shade increases, t
 #| messages: false
 #| echo: false
 #| warning: false
-#Figure 3 - Linear regression plot
+
+
+#plot graph to show linear regression
 
 brand_origin |>
   ggplot(mapping = aes(x = S, y = L)) +
@@ -228,12 +241,15 @@ brand_origin |>
   theme_minimal() +
   labs(
     y = "Lightness", 
-    x = "Saturation"
+    x = "Saturation", 
+    title = "Linear Regression Plot"
   )
 
 ```
 
 Figure 3 illustrates this relationship between saturation and lightness, where a scatterplot of the data points with saturation on the x-axis and lightness on the y-axis shows a clear downward slope. The fitted regression line represents the overall trend of the data, with the slope indicating that as saturation increases, the predicted lightness of the foundation shade decreases. It is worth noting that the intercept value of 100.31483 is not a meaningful value in this context since a foundation shade cannot have zero saturation. 
+
+\newpage
 
 # Discussion 
 
@@ -245,7 +261,8 @@ In order to provide a more detailed exposition of the results obtained from the 
 #| echo: false
 #| warning: false
 
-# figure 4 - Japanese brands and their products
+
+# plot graph to show relationship in Japan
 
 
 brand_origin |>
@@ -257,18 +274,19 @@ brand_origin |>
   theme_minimal() +
    labs(x = "Lightness",
     y = "Saturation",
-    title = "Japanese Brands and their relationship between Lightness and Saturation", 
+    title = "Fig. 4: Relationship between Lightness and Saturation in Shades in Japan",
     caption = "Data source: The Pudding") 
     
 
 ```
 
-In Japan, a negative linear relationship between the saturation and lightness of foundation shades is observed, as depicted in Figure 4. The data indicates that as the lightness of foundation shades increases, their saturation decreases, suggesting that lighter foundations tend to appear ashier or cooler-toned than their darker counterparts. According to a study conducted by L’Oréal, East Asian women have a skin tone range of 55-75 in lightness with warmer tones. The brands closest to the regression line seen in Figure 3 with the widest range in lightness and saturation are Addiction, NARS, and Shu Uemera, as demonstrated in Figure 4. 
+In Japan, a negative linear relationship between the saturation and lightness of foundation shades is observed, as depicted in Figure 4. The data indicates that as the lightness of foundation shades increases, their saturation decreases, suggesting that lighter foundations tend to appear ashier or cooler-toned than their darker counterparts. According to a study conducted by L’Oréal, East Asian women have a skin tone range of 55-75 in lightness with warmer tones [@loreal]. The brands closest to the regression line seen in Figure 3 with the widest range in lightness and saturation are Addiction, NARS, and Shu Uemera, as demonstrated in Figure 4. 
 
 When comparing domestic and international brand offerings, it is noteworthy that Japanese brands, including Addiction, Kate, Shu Uemura, and RMK, offer shades in the 85-90 lightness range, which is significantly lighter than the skin tone range. NARS, originally a foreign brand but now a subsidiary of Shiseido, offers a wider range of shades in both saturation and lightness in contrast with Shiseido. Conversely, although Shu Uemera, a Japanese brand, was acquired by L’Oréal, it still maintains a wide distribution. In contrast, the international luxury brand Dior only offers cool-toned shades within the lighter end of the skin tone range. 
 
-The data suggest that foundation offerings in Japan tend to skew toward the fairer end of the skin tone range or significantly lighter. While there are options available for Japanese consumers to find foundation within their skin-tone range, the average foundation shade is lighter and ashier, reflecting a preference for fairer skin, and reinforcing the notion that lighter skin is more desirable. This reinforces the societal pressure to conform to certain beauty standards and can exacerbate colourism by perpetuating the notion that lighter skin is superior to darker skin tones. The negative correlation between saturation and lightness observed in the data also implies that consumers with warmer undertones may encounter difficulties in finding foundation shades that strike the appropriate balance between warmth and lightness. Specifically, they may find that foundation shades with warm undertones are excessively dark, while those with cooler undertones are excessively light. This highlights the necessity for makeup brands to provide a diverse range of foundation shades that cater to a variety of undertones and levels of saturation.
+The data suggest that foundation offerings in Japan tend to skew toward the fairer end of the skin tone range or significantly lighter. While there are options available for Japanese consumers to find foundation within their skin-tone range, the average foundation shade is lighter and ashier, reflecting a preference for fairer skin, and reinforcing the notion that lighter skin is more desirable. This reinforces the societal pressure to conform to certain beauty standards and can exacerbate colorism by perpetuating the notion that lighter skin is superior to darker skin tones [@japan]. The negative correlation between saturation and lightness observed in the data also implies that consumers with warmer undertones may encounter difficulties in finding foundation shades that strike the appropriate balance between warmth and lightness. Specifically, they may find that foundation shades with warm undertones are excessively dark, while those with cooler undertones are excessively light. This highlights the necessity for makeup brands to provide a diverse range of foundation shades that cater to a variety of undertones and levels of saturation.
 
+\newpage
 
 ## Indian foundation shades are significantly lighter than the natural skin tone.
 ```{r}
@@ -276,7 +294,9 @@ The data suggest that foundation offerings in Japan tend to skew toward the fair
 #| echo: false
 #| warning: false
 
-#Figure 5 - Indian Brands and their Products
+
+# plot graph to show relationship in India 
+
 brand_origin |>
   filter(group == 'India') |>
   ggplot(aes(L, S)) +
@@ -284,14 +304,14 @@ brand_origin |>
   facet_wrap(vars(brand), scales = "free") +
   theme_minimal() +
    labs(x = "Lightness",
-    y = "Saturation",
-    title = "Indian Brands and their relationship between Lightness and Saturation", 
+    y = "Saturation", 
+    title = "Fig. 5: Relationship between Lightness and Saturation in Shades in India",
     caption = "Data source: The Pudding") 
 
 ```
 
 
-Figure 5 presents a noteworthy disparity in the distribution of foundation shades across various brands concerning their lightness and saturation attributes. Specifically, it appears that domestic brands in India offer fewer foundation shades compared to international brands like L’Oréal and Maybelline. However, despite Indian skin tones falling within a lightness range of 30-65 and exhibiting warm-toned features, the majority of foundation shades offered by international brands are noticeably situated in the 70-85 lightness range. This observation suggests that international brands tend to prioritize whiteness more than local brands.
+Figure 5 presents a noteworthy disparity in the distribution of foundation shades across various brands concerning their lightness and saturation attributes. Specifically, it appears that domestic brands in India offer fewer foundation shades compared to international brands like L’Oréal and Maybelline. However, despite Indian skin tones falling within a lightness range of 30-65 and exhibiting warm-toned features, the majority of foundation shades offered by international brands are noticeably situated in the 70-85 lightness range [@loreal]. This observation suggests that international brands tend to prioritize whiteness more than local brands.
 
 Nevertheless, it is important to note that L’Oréal is the only international brand that offers a shade of around 30 with higher saturation. In contrast, the darkest shade provided by a domestic brand is approximately 50, offered by Olivia, which presents all of their products with a warmer tone in contrast to other brands. Furthermore, excluding Lakmé and Olivia, all other domestic brands commence their shade range beyond the maximum limit of the skin tone range. This indicates that Indian consumers tend to purchase foundation shades that are significantly lighter and cooler than their natural skin tone.
 
@@ -299,7 +319,7 @@ The data highlights the tendency of international brands to prioritize whiteness
 
 
 
-
+\newpage
 
 
 ## Weaknesses & Next Steps
@@ -324,13 +344,29 @@ The roots of colorism in Japan and India can be traced back to its cultural and 
 
 
 
- \newpage
+# Appendix
 
-## Appendix
+## Model Testing
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#linearity assumption
+plot(model$fitted.values, model$residuals)
 
+
+#normality assumption
+qqnorm(model$residuals)
+qqline(model$residuals)
+
+
+#homoscedasticity
+plot(model$fitted.values, sqrt(abs(model$residuals)), pch=20, main="Scale-Location Plot")
+abline(h = mean(sqrt(abs(model$residuals))), col="red")
+```
 
 \newpage
 
-## References
+# References
 
 <!-- Comment required to show references as a numbered section -->
