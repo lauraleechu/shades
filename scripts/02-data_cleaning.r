@@ -17,7 +17,7 @@ library(janitor)
 #Fetch and clean shade data by country and brand  
 cleanshades <- readr::read_csv(here::here("inputs/data/raw/rawshades.csv"), show_col_types = FALSE) |>
   # Change column naming format
-  select(brand, L, H, group, hex) |>
+  select(brand, L, S, group, hex) |>
   filter(group > 5) |>
   mutate(group = str_replace(group, '6', 'Japan')) |>
   mutate(group = str_replace(group, '7', 'India'))
@@ -55,6 +55,8 @@ write_csv(
   file = here::here("inputs/data/clean/brand_origin.csv"),
 )
 ```
+
+
 
 ```{r}
 
