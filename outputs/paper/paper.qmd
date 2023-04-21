@@ -35,6 +35,7 @@ library(readr)
 library(kableExtra)
 library(broom)
 
+
 # Fetching the shade range data 
 cleanshades <- readr::read_csv(here::here("inputs/data/clean/cleanshades.csv"), show_col_types = FALSE)
 
@@ -59,7 +60,6 @@ To better understand the issue of colorism in Japan and India, the present study
 
 This paper examines the association between the lightness and saturation of foundation shades provided by leading makeup brands in India and Japan. The findings revealed that international brands exhibit a preference for lighter shades, whereas domestic brands offer a broader spectrum of shades with warmer undertones. A linear regression model was employed, and a noteworthy negative correlation was discovered between the saturation and lightness of foundation shades. Specifically, as saturation rises, the expected lightness of the foundation shade diminishes. The study further unveiled that, on average, Japanese foundation shades are paler and have an ashier tone, whereas Indian foundation shades are substantially lighter than the natural skin tone. This scarcity of foundation shades for individuals with darker skin tones can lead to their marginalization and exclusion.
 
-\newpage
 
 # Data 
 
@@ -89,6 +89,8 @@ One of the limitations of the dataset used in this study is that it only covers 
 This study primarily employs lightness values (L*) to quantify the degree of lightness or darkness in foundation shades and Saturation to evaluate foundation undertone shades. The lightness values are represented on a scale of 0-100, with 100 being the highest value, indicating the lightest shade. Saturation is measured as the amount of gray present in a colour, using a decimal value between 0 and 1. The degree of saturation is directly proportional to the vividness and intensity of the colour. Conversely, a low level of saturation implies a colour that is closer to pure gray on the grayscale.
 
 
+\newpage
+
 ## Data Cleaning 
 
 To narrow the scope of the study to Asia, the focus was shifted to only include India and Japan, leading to the filtering of the dataset to only retain these two groups. The data was further refined by isolating brand, lightness, and saturation values, with the lightness values being grouped into ranges of 10. Subsequently, each makeup brand was researched individually to classify them as either domestic or international, to assess any potential differences in shade ranges between these two categories. While the dataset contained information on multiple products from a single brand, this study aims to explore the wider implications of the shade ranges offered within each country.
@@ -101,21 +103,21 @@ To narrow the scope of the study to Asia, the focus was shifted to only include 
 
 
 #Create table to summarize lightness range 
-
- summary <- brand_origin |>
+summary <- brand_origin |>
   tabyl(group, light_range) |>
   adorn_totals("col") 
 
 colnames(summary) <- c("Country", "20 - 30", "50-60", "60-70", "70-80", "80-90", "Total")
 
 summary |>
-  kable(caption = "Table 1: Total number of products by lightness range in India & Japan") |>
-  kable_styling(full_width = F) |>
+  kable(caption = "Total number of products by lightness range in India and Japan") |>
+  kable_styling() |>
   add_header_above(c(" " = 1, "Lightness Range" = 6))
+
 
 ```
 
-The dataset comprises 9 distinct brands for India and 8 for Japan. Table 2 indicates that Japan features a greater number of shades compared to India. Nevertheless, both countries exhibit a similar pattern of maximum product offerings in the 70-80 shade range, followed by the 80-90 range as the second-highest, and subsequently the 60-70 and 50-60 ranges. Notably, only one product belonging to India is classified in the 20-30 shade range, while Japan has none. Furthermore, the table demonstrates that Japan and India share a comparable distribution of lightness among their product ranges. 
+The dataset comprises 9 distinct brands for India and 8 for Japan. Table 1 indicates that Japan features a greater number of shades compared to India. Nevertheless, both countries exhibit a similar pattern of maximum product offerings in the 70-80 shade range, followed by the 80-90 range as the second-highest, and subsequently the 60-70 and 50-60 ranges. Notably, only one product belonging to India is classified in the 20-30 shade range, while Japan has none. Furthermore, the table demonstrates that Japan and India share a comparable distribution of lightness among their product ranges. 
 
 
 
@@ -123,6 +125,7 @@ The dataset comprises 9 distinct brands for India and 8 for Japan. Table 2 indic
 #| messages: false
 #| echo: false
 #| warning: false
+
 
 #plot graph to show shade distribution by lightness
 
@@ -133,9 +136,8 @@ brand_origin |>
   theme_minimal() +
   labs(x = "Country",
     y = "Lightness",
-    title = "Fig. 1: Shade Distribution by Lightness: Domestic vs. International Brands",
-    color = "Country",
-    caption = "Data source: The Pudding.")
+    caption = "Fig. 1: Shade Distribution by Lightness: Domestic vs. International Brands",
+    color = "Country") 
 ```
 
 
@@ -154,8 +156,8 @@ brand_origin |>
   labs(x = "Country",
     y = "Saturation",
     color = "Country",
-    title = "Fig. 2: Shade Distribution by Saturation: Domestic vs. International Brands",
-    caption = "Data source: The Pudding") 
+    caption = "Fig. 2: Shade Distribution by Saturation: Domestic vs. International Brands") 
+
  
 
 ```
@@ -197,7 +199,7 @@ In this project, the lightness variable ($L$) is measured on a scale of 0 to 100
 \newpage
 
 # Results
-
+This study employed a linear regression model to investigate the association between the lightness (L) and saturation (S) of foundation shades offered by popular makeup brands in Japan and India. As presented in Table 2, the model yielded an estimated intercept of 100.31483, indicating that the expected lightness of foundation shades when saturation is zero is 100.31483. The model also revealed a statistically significant negative regression coefficient of -60.59635 for saturation (t = -12.98632, p < .001), indicating a significant negative linear relationship between saturation and lightness of foundation shades.
 ```{r}
 #| messages: false
 #| echo: false
@@ -209,13 +211,13 @@ model <- lm(L ~ S, data = brand_origin)
 
 summary <- tidy(model)
 
-kbl(summary, caption = "Table 2: Linear Regression Model Summary") |>
+kbl(summary, caption = "Linear Regression Model Summary") |>
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
 
 
 ```
 
-This study employed a linear regression model to investigate the association between the lightness (L) and saturation (S) of foundation shades offered by popular makeup brands in Japan and India. As presented in Table 2, the model yielded an estimated intercept of 100.31483, indicating that the expected lightness of foundation shades when saturation is zero is 100.31483. The model also revealed a statistically significant negative regression coefficient of -60.59635 for saturation (t = -12.98632, p < .001), indicating a significant negative linear relationship between saturation and lightness of foundation shades.
+
 
 These findings suggest that as the saturation of a foundation shade increases, the predicted lightness of that shade decreases by approximately 60.59635 units, holding all other variables constant. This indicates that the foundation shades with higher saturation tend to be darker, while those with lower saturation tend to be lighter. Furthermore, the obtained intercept value of 100.31483 implies that the range of foundation shades provided by the examined brands is generally on the lighter end in both Japan and India.
 
@@ -269,8 +271,7 @@ brand_origin |>
   theme_minimal() +
    labs(x = "Lightness",
     y = "Saturation",
-    title = "Fig. 4: Relationship between Lightness and Saturation in Shades in Japan",
-    caption = "Data source: The Pudding") 
+    caption = "Fig. 4: Relationship between Lightness and Saturation in Shades in Japan") 
     
 
 ```
@@ -300,8 +301,7 @@ brand_origin |>
   theme_minimal() +
    labs(x = "Lightness",
     y = "Saturation", 
-    title = "Fig. 5: Relationship between Lightness and Saturation in Shades in India",
-    caption = "Data source: The Pudding") 
+    caption = "Fig. 5: Relationship between Lightness and Saturation in Shades in India") 
 
 ```
 
